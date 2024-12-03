@@ -1,7 +1,7 @@
 public class PriorityScheduler extends CPUSchedular {
     
-    public PriorityScheduler(Process[] processes) {
-        super(processes);
+    public PriorityScheduler(Process[] processes,int contextSwitch) {
+        super(processes,contextSwitch);
     }
     
     @Override

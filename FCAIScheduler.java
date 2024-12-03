@@ -1,7 +1,7 @@
 public class FCAIScheduler extends CPUSchedular {
     
-    public FCAIScheduler(Process[] processes) {
-        super(processes);
+    public FCAIScheduler(Process[] processes,int contextSwitch) {
+        super(processes,contextSwitch);
     }
 
     @Override
