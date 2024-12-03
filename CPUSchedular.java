@@ -1,11 +1,9 @@
-public class CPUSchedular{
+public abstract class CPUSchedular{
     private Process[] processes;
 
     public CPUSchedular(Process[] processes){
         this.processes = processes;
     }
 
-    public void ShortestJobFirst(){
-        
-    }
+    public abstract void execute();
 }
