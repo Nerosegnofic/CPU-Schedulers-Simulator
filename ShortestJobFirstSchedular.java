@@ -3,8 +3,8 @@ import java.util.Comparator;
 
 public class ShortestJobFirstSchedular extends CPUSchedular{
 
-    public ShortestJobFirstSchedular(Process[] processes) {
-        super(processes);
+    public ShortestJobFirstSchedular(Process[] processes,int contextSwitch) {
+        super(processes,contextSwitch);
         Arrays.sort(this.processes,Comparator.comparing(p -> p.getBurstTime()));
     }
 
