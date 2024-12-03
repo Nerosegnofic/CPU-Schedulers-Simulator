@@ -1,5 +1,6 @@
 public class Process{
     private String name;
+    private String color;
     private int arrivalTime;
     private int burstTime;
     private int waitingTime;
@@ -10,13 +11,18 @@ public class Process{
     private int quantum;
     private int FCAI_factor;
 
-    public Process(String name, int arrivalTime, int burstTime, int priority, int quantum){
+    public Process(String name, String color, int arrivalTime, int burstTime, int priority, int quantum){
         this.name = name;
+        this.color = color;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
         this.priority = priority;
         this.quantum = quantum;
         this.remainingTime = burstTime;
+    }
+
+    public void process(int processTime){
+        remainingTime -= processTime;
     }
 
     public String getName(){
@@ -25,6 +31,14 @@ public class Process{
 
     public void setName(String name){
         this.name = name;
+    }
+
+    public String getColor(){
+        return color;
+    }
+
+    public void setColor(String color){
+        this.color = color;
     }
 
     public int getArrivalTime(){
@@ -97,5 +111,10 @@ public class Process{
 
     public void setFCAI_factor(int FCAI_factor){
         this.FCAI_factor = FCAI_factor;
+    }
+
+    // @override
+    public String toString(){
+        return this.name;
     }
 }
