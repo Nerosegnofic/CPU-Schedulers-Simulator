@@ -1,8 +1,8 @@
-public abstract class CPUSchedular{
+public abstract class CPUScheduler{
     protected Process[] processes;
     protected int contextSwitch;
 
-    public CPUSchedular(Process[] processes,int contextSwitch){
+    public CPUScheduler(Process[] processes,int contextSwitch){
         this.processes = processes;
         this.contextSwitch = contextSwitch;
     }

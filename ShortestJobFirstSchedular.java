@@ -1,7 +1,7 @@
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class ShortestJobFirstSchedular extends CPUSchedular{
+public class ShortestJobFirstSchedular extends CPUScheduler{
 
     public ShortestJobFirstSchedular(Process[] processes,int contextSwitch) {
         super(processes,contextSwitch);

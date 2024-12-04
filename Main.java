@@ -6,9 +6,9 @@ public class Main {
             new Process("whatsapp", null, 2, 5, 0, 0),
             new Process("VS code", null, 2, 15, 0, 0),
             new Process("something else", null, 4, 3, 0, 0),
-            new Process("My Computer", null, 5, 2, 0, 0),
+            new Process("My Computer", null, 6, 2, 0, 0),
         };
-        CPUSchedular schedular = new ShortestRemainingTimeFirstScheduler(processes,1);
-        schedular.execute();
+        CPUScheduler scheduler = new ShortestRemainingTimeFirstScheduler(processes,1);
+        scheduler.execute();
     }
 }
