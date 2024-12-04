@@ -12,28 +12,28 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
 
     @Override
     public void execute() {
-        TreeSet <Process> set = new TreeSet<>(
+        TreeSet <Process> shortestRemaining = new TreeSet<>(
             (Process p, Process s) -> Integer.compare(p.getRemainingTime(),s.getRemainingTime())
         );
         int idx = 0,time = 0;
         Process current = null;
-        while(idx < processes.length || !set.isEmpty()){
+        while(idx < processes.length || !shortestRemaining.isEmpty()){
             while (idx < processes.length && time >= processes[idx].getArrivalTime() )
-                set.add(processes[idx++]);
-            if (!set.isEmpty()){
-                if (!set.first().equals(current)){
+                shortestRemaining.add(processes[idx++]);
+            if (!shortestRemaining.isEmpty()){
+                if (!shortestRemaining.first().equals(current)){
                     if (current != null){
                         System.out.println("terminated: " + current + " till: " + time + " remaining: " + current.getRemainingTime());
                         time += contextSwitch;
                     }
-                    current = set.first();
+                    current = shortestRemaining.first();
                 }
                 current.process(1);
                 if (current.getRemainingTime() <= 0){
                     System.out.println("processed: " + current + " till: " + time + " remaining: " + current.getRemainingTime());
-                    set.remove(current);
-                    if (!set.isEmpty()){
-                        current = set.first();
+                    shortestRemaining.remove(current);
+                    if (!shortestRemaining.isEmpty()){
+                        current = shortestRemaining.first();
                         time += contextSwitch;
                     }
                 }
