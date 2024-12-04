@@ -1,4 +1,4 @@
-public class PriorityScheduler extends CPUSchedular {
+public class PriorityScheduler extends CPUScheduler {
     
     public PriorityScheduler(Process[] processes,int contextSwitch) {
         super(processes,contextSwitch);
