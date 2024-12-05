@@ -9,6 +9,8 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
 
     @Override
     public void execute() {
+        int totalWaitingTime = 0;
+        int totalTurnaroundTime = 0;
 
         if (n == 0) {
             System.out.println("No processes to schedule.");
@@ -67,9 +69,16 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
         System.out.println("Process Execution Complete:");
         System.out.println("ID\tArrival\tBurst\tCompletion\tTurnaround\tWaiting");
         for (Process process : processes) {
+            totalWaitingTime += process.getWaitingTime();
+            totalTurnaroundTime += process.getTurnAroundTime();
             System.out.printf("%s\t%d\t\t%d\t\t%d\t\t\t%d\t\t\t%d%n",
                     process.getName(), process.getArrivalTime(), process.getBurstTime(), process.getCompletionTime(),
                     process.getTurnAroundTime(), process.getWaitingTime());
         }
+        double averageWaitingTime = (double) totalWaitingTime / processes.size();
+        double averageTurnaroundTime = (double) totalTurnaroundTime / processes.size();
+
+        System.out.printf("Average Waiting Time: %.2f\n", averageWaitingTime);
+        System.out.printf("Average Turnaround Time: %.2f\n", averageTurnaroundTime);
     }
 }
