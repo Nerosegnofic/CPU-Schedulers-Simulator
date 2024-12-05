@@ -12,18 +12,15 @@ public class Main {
         processes.add(new Process("P2", null, 2, 4, 2, 0));
         processes.add(new Process("P3", null, 4, 1, 1, 0));
         processes.add(new Process("P4", null, 5, 4, 5, 0));
-        if (choice == 1) {
-            scheduler = new PriorityScheduler(processes, 0);
-        } else if (choice == 2) {
-            scheduler = new ShortestJobFirstScheduler(processes, 0);
-        } else if (choice == 3) {
-            scheduler = new ShortestRemainingTimeFirstScheduler(processes, 0);
-        } else if (choice == 4) {
-            scheduler = new FCAIScheduler(processes, 0);
-        } else {
-            return;
-        }
-        scheduler.execute();
+        scheduler = switch (choice){
+            case 1 -> new PriorityScheduler(processes,0);
+            case 2 -> new ShortestJobFirstScheduler(processes,0);
+            case 3 -> new ShortestRemainingTimeFirstScheduler(processes,0);
+            case 4 -> new FCAIScheduler(processes,0);
+            default -> null;
+        };
+        if (scheduler != null)
+            scheduler.execute();
     }
 
     public static int promptUserForAlgorithm() {
