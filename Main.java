@@ -8,19 +8,21 @@ public class Main {
         CPUScheduler scheduler;
         System.out.println();
         List<Process> processes = new ArrayList<>();
-        processes.add(new Process("P1", null, 0, 7, 4, 0));
-        processes.add(new Process("P2", null, 2, 4, 2, 0));
-        processes.add(new Process("P3", null, 4, 1, 1, 0));
-        processes.add(new Process("P4", null, 5, 4, 5, 0));
-        scheduler = switch (choice){
+        processes.add(new Process("P1", null, 0, 10, 3, 0));
+        processes.add(new Process("P2", null, 0, 1, 1, 0));
+        processes.add(new Process("P3", null, 0, 2, 4, 0));
+        processes.add(new Process("P4", null, 0, 1, 5, 0));
+        processes.add(new Process("P5", null, 0, 5, 2, 0));
+        scheduler = switch (choice) {
             case 1 -> new PriorityScheduler(processes,0);
             case 2 -> new ShortestJobFirstScheduler(processes,0);
             case 3 -> new ShortestRemainingTimeFirstScheduler(processes,0);
             case 4 -> new FCAIScheduler(processes,0);
             default -> null;
         };
-        if (scheduler != null)
+        if (scheduler != null) {
             scheduler.execute();
+        }
     }
 
     public static int promptUserForAlgorithm() {
