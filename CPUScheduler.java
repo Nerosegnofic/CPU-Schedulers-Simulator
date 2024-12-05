@@ -1,10 +1,14 @@
-public abstract class CPUScheduler{
-    protected Process[] processes;
-    protected int contextSwitch;
+import java.util.List;
 
-    public CPUScheduler(Process[] processes,int contextSwitch){
+public abstract class CPUScheduler {
+    protected List<Process> processes;
+    protected int contextSwitchTime;
+    protected int n;
+
+    public CPUScheduler(List<Process> processes, int contextSwitchTime) {
         this.processes = processes;
-        this.contextSwitch = contextSwitch;
+        this.contextSwitchTime = contextSwitchTime;
+        this.n = processes.size();
     }
 
     public abstract void execute();

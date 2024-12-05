@@ -1,6 +1,8 @@
+import java.util.List;
+
 public class FCAIScheduler extends CPUScheduler {
-    
-    public FCAIScheduler(Process[] processes,int contextSwitch) {
+
+    public FCAIScheduler(List<Process> processes, int contextSwitch) {
         super(processes,contextSwitch);
     }
 
