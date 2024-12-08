@@ -29,30 +29,32 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
                     System.out.println("Time " + currentTime + ": " + process.getName() + " arrives.");
                 }
             }
-
+            
+            int finalCurrentTime = currentTime;
             readyQueue.sort((p1, p2) -> {
-                if (p1.getRemainingTime() == p2.getRemainingTime()) {
-                    return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
-                }
-                return Integer.compare(p1.getRemainingTime(), p2.getRemainingTime());
+                // This doesn't actually modify the burst time of the processes,
+                // but it increases the process's priority in the ready queue.
+                int p1EffectiveBurst = p1.getRemainingTime() - (finalCurrentTime - p1.getArrivalTime()) / 2;
+                int p2EffectiveBurst = p2.getRemainingTime() - (finalCurrentTime - p2.getArrivalTime()) / 2;
+                return Integer.compare(p1EffectiveBurst, p2EffectiveBurst);
             });
-
+            
             if (!readyQueue.isEmpty()) {
-                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.getFirst()) {
+                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(0)) {
                     currentTime += contextSwitchTime;
-                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.getFirst().getName());
+                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.get(0).getName());
                 }
 
-                if (currentProcess != readyQueue.getFirst()) {
-                    currentProcess = readyQueue.getFirst();
+                if (currentProcess != readyQueue.get(0)) {
+                    currentProcess = readyQueue.get(0);
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " starts executing.");
                 }
             }
-
+            
             if (currentProcess != null) {
                 currentProcess.process(1);
                 currentTime++;
-
+                
                 if (currentProcess.getRemainingTime() == 0) {
                     completedProcesses++;
                     currentProcess.setCompletionTime(currentTime);
@@ -65,7 +67,7 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
                 currentTime++;
             }
         }
-
+        
         System.out.println("Process Execution Complete:");
         System.out.println("ID\tArrival\tBurst\tCompletion\tTurnaround\tWaiting");
         for (Process process : processes) {
