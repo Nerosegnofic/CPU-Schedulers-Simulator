@@ -61,8 +61,6 @@ public class Main {
         processes.add(new Process("P3", null, 2, 9, 0, 0));
         processes.add(new Process("P4", null, 3, 5, 0, 0)); */
 
-
-
 /*      FCAI Scheduler Test Case
         processes.add(new Process("P1", null, 0, 17, 4, 4));
         processes.add(new Process("P2", null, 3, 6, 9, 3));
