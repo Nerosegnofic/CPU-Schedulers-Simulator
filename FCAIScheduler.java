@@ -48,7 +48,7 @@ public class FCAIScheduler extends CPUScheduler {
             }
 
             int finalCurrentTime = currentTime;
-            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p2, finalCurrentTime), calculateFCAIFactor(p1, finalCurrentTime)));
+            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1, finalCurrentTime), calculateFCAIFactor(p2, finalCurrentTime)));
 
             if (!readyQueue.isEmpty()) {
                 if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(0)) {
