@@ -43,7 +43,7 @@ public class FCAIScheduler extends CPUScheduler {
             for (Process process : processes) {
                 if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
                     readyQueue.add(process);
-                    System.out.println("Time " + currentTime + ": " + process.getName() + " arrives.");
+                    System.out.println("Time " + process.getArrivalTime() + ": " + process.getName() + " arrives.");
                 }
             }
 
