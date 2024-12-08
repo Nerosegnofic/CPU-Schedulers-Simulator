@@ -8,11 +8,12 @@ public class Main {
         CPUScheduler scheduler;
         System.out.println();
         List<Process> processes = new ArrayList<>();
-        processes.add(new Process("P1", null, 0, 10, 3, 0));
-        processes.add(new Process("P2", null, 0, 1, 1, 0));
-        processes.add(new Process("P3", null, 0, 2, 4, 0));
-        processes.add(new Process("P4", null, 0, 1, 5, 0));
-        processes.add(new Process("P5", null, 0, 5, 2, 0));
+        processes.add(new Process("P1", null, 0, 2, 3, 0));
+        processes.add(new Process("P2", null, 1, 3, 1, 0));
+        processes.add(new Process("P3", null, 2, 4, 4, 0));
+        processes.add(new Process("P4", null, 3, 15, 5, 0));
+        processes.add(new Process("P5", null, 6, 1, 5, 0));
+        processes.add(new Process("P6", null, 6, 2, 5, 0));
         scheduler = switch (choice) {
             case 1 -> new PriorityScheduler(processes,0);
             case 2 -> new ShortestJobFirstScheduler(processes,0);
