@@ -28,7 +28,14 @@ public class ShortestJobFirstScheduler extends CPUScheduler {
             }
 
             if (!readyQueue.isEmpty()) {
-                readyQueue.sort(Comparator.comparingInt(Process::getRemainingTime));
+                int finalCurrentTime = currentTime;
+                readyQueue.sort((p1, p2) -> {
+                    // This doesn't actually modify the burst time of the processes,
+                    // but it increases the process's priority in the ready queue.
+                    int p1EffectiveBurst = p1.getRemainingTime() - (finalCurrentTime - p1.getArrivalTime()) / 2;
+                    int p2EffectiveBurst = p2.getRemainingTime() - (finalCurrentTime - p2.getArrivalTime()) / 2;
+                    return Integer.compare(p1EffectiveBurst, p2EffectiveBurst);
+                });
 
                 Process nextProcess = readyQueue.getFirst();
 
@@ -69,6 +76,7 @@ public class ShortestJobFirstScheduler extends CPUScheduler {
                     process.getName(), process.getArrivalTime(), process.getBurstTime(), process.getCompletionTime(),
                     process.getTurnAroundTime(), process.getWaitingTime());
         }
+
         double averageWaitingTime = (double) totalWaitingTime / processes.size();
         double averageTurnaroundTime = (double) totalTurnaroundTime / processes.size();
 
