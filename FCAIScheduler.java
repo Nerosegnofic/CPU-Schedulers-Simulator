@@ -80,16 +80,14 @@ public class FCAIScheduler extends CPUScheduler {
                     currentProcess.setWaitingTime(currentProcess.getTurnAroundTime() - currentProcess.getBurstTime());
                     readyQueue.remove(currentProcess);
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " finishes executing.");
-                } else {
-                    readyQueue.remove(currentProcess);
+                } else if (executionTime == currentProcess.getQuantum())
                     currentProcess.setQuantum(currentProcess.getQuantum() + 2);
-                    readyQueue.add(currentProcess);
-                }
-            } else {
-                currentTime++;
+                else
+                    currentProcess.setQuantum(currentProcess.getQuantum()-executionTime);
             }
+            else
+                currentTime++;
         }
-
         System.out.println("Process Execution Complete:");
         System.out.println("ID\tArrival\tBurst\tCompletion\tTurnaround\tWaiting");
         for (Process process : processes) {
