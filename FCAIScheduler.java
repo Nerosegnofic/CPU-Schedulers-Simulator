@@ -1,108 +1,93 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class FCAIScheduler extends CPUScheduler {
 
-    private double V1;
-    private double V2;
+    private int V1;
+    private int V2;
 
     public FCAIScheduler(List<Process> processes, int contextSwitchTime) {
         super(processes, contextSwitchTime);
-        calculateFactors();
+        calculateV1V2();
     }
 
-    private void calculateFactors() {
+    // Calculate V1 and V2 based on the problem requirements
+    private void calculateV1V2() {
         int lastArrivalTime = processes.stream().mapToInt(Process::getArrivalTime).max().orElse(1);
         int maxBurstTime = processes.stream().mapToInt(Process::getBurstTime).max().orElse(1);
-        V1 = lastArrivalTime / 10.0;
-        V2 = maxBurstTime / 10.0;
-    }
-
-    private double calculateFCAIFactor(Process process, int currentTime) {
-        return (10 - process.getPriority())
-                + (process.getArrivalTime() / V1)
-                + (process.getRemainingTime() / V2);
+        V1 = lastArrivalTime / 10;
+        V2 = maxBurstTime / 10;
     }
 
     @Override
     public void execute() {
-        int totalWaitingTime = 0;
-        int totalTurnaroundTime = 0;
+        PriorityQueue<Process> queue = new PriorityQueue<>(
+                Comparator.comparingInt(Process::getFCAI_factor).reversed() // Max-Heap based on FCAI_factor
+        );
 
-        if (n == 0) {
-            System.out.println("No processes to schedule.");
-            return;
-        }
-
-        List<Process> readyQueue = new ArrayList<>();
         int currentTime = 0;
-        int completedProcesses = 0;
-        Process currentProcess = null;
+        List<Process> completedProcesses = new ArrayList<>();
 
-        while (completedProcesses < n) {
-            for (Process process : processes) {
-                if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
-                    readyQueue.add(process);
-                    System.out.println("Time " + currentTime + ": " + process.getName() + " arrives.");
+        while (!processes.isEmpty() || !queue.isEmpty()) {
+            // Add processes that have arrived by current time to the queue
+            for (Iterator<Process> it = processes.iterator(); it.hasNext();) {
+                Process process = it.next();
+                if (process.getArrivalTime() <= currentTime) {
+                    process.setFCAI_factor(calculateFCAIFactor(process));
+                    queue.add(process);
+                    it.remove();
                 }
             }
 
-            int finalCurrentTime = currentTime;
-            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p2, finalCurrentTime), calculateFCAIFactor(p1, finalCurrentTime)));
+            if (!queue.isEmpty()) {
+                Process current = queue.poll();
+                int executionTime = Math.min(current.getQuantum(), current.getRemainingTime());
+                System.out.println("Time " + currentTime + ": Executing " + current.getName() + " for " + executionTime + " units");
 
-            if (!readyQueue.isEmpty()) {
-                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(0)) {
-                    currentTime += contextSwitchTime;
-                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.get(0).getName());
-                }
+                // Simulate execution
+                current.process(executionTime);
+                currentTime += executionTime + contextSwitchTime;
 
-                if (currentProcess != readyQueue.get(0)) {
-                    currentProcess = readyQueue.get(0);
-                    System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " starts executing.");
-                }
-            }
-
-            if (currentProcess != null) {
-                int quantum = currentProcess.getQuantum();
-                int executionTime = (int) Math.ceil(quantum * 0.4);
-
-                if (executionTime > currentProcess.getRemainingTime()) {
-                    executionTime = currentProcess.getRemainingTime();
-                }
-
-                currentProcess.process(executionTime);
-                currentTime += executionTime;
-
-                if (currentProcess.getRemainingTime() == 0) {
-                    completedProcesses++;
-                    currentProcess.setCompletionTime(currentTime);
-                    currentProcess.setTurnAroundTime(currentProcess.getCompletionTime() - currentProcess.getArrivalTime());
-                    currentProcess.setWaitingTime(currentProcess.getTurnAroundTime() - currentProcess.getBurstTime());
-                    readyQueue.remove(currentProcess);
-                    System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " finishes executing.");
+                if (current.getRemainingTime() > 0) {
+                    // Process is not completed, update quantum and FCAI_factor
+                    current.setQuantum(current.getQuantum() + 2); // Increase quantum
+                    current.setFCAI_factor(calculateFCAIFactor(current));
+                    queue.add(current);
                 } else {
-                    readyQueue.remove(currentProcess);
-                    currentProcess.setQuantum(currentProcess.getQuantum() + 2);
-                    readyQueue.add(currentProcess);
+                    // Process is completed, calculate and store metrics
+                    current.setCompletionTime(currentTime - contextSwitchTime);
+                    current.setTurnAroundTime(current.getCompletionTime() - current.getArrivalTime());
+                    current.setWaitingTime(current.getTurnAroundTime() - current.getBurstTime());
+                    completedProcesses.add(current);
                 }
             } else {
-                currentTime++;
+                currentTime++; // Idle time increment
             }
         }
 
-        System.out.println("Process Execution Complete:");
-        System.out.println("ID\tArrival\tBurst\tCompletion\tTurnaround\tWaiting");
-        for (Process process : processes) {
-            totalWaitingTime += process.getWaitingTime();
-            totalTurnaroundTime += process.getTurnAroundTime();
-            System.out.printf("%s\t%d\t\t%d\t\t%d\t\t\t%d\t\t\t%d%n",
-                    process.getName(), process.getArrivalTime(), process.getBurstTime(), process.getCompletionTime(),
-                    process.getTurnAroundTime(), process.getWaitingTime());
-        }
-        double averageWaitingTime = (double) totalWaitingTime / processes.size();
-        double averageTurnaroundTime = (double) totalTurnaroundTime / processes.size();
+        displayResults(completedProcesses);
+    }
 
-        System.out.printf("Average Waiting Time: %.2f\n", averageWaitingTime);
-        System.out.printf("Average Turnaround Time: %.2f\n", averageTurnaroundTime);
+    // Calculate FCAI Factor
+    private int calculateFCAIFactor(Process process) {
+        return (10 - process.getPriority()) +
+                (process.getArrivalTime() / V1) +
+                (process.getRemainingTime() / V2);
+    }
+
+    // Display results for the completed processes
+    private void displayResults(List<Process> completedProcesses) {
+        System.out.println("\n--- FCAI Scheduling Results ---");
+        int totalWaitingTime = 0;
+        int totalTurnAroundTime = 0;
+
+        for (Process process : completedProcesses) {
+            totalWaitingTime += process.getWaitingTime();
+            totalTurnAroundTime += process.getTurnAroundTime();
+            System.out.printf("Process %s: Waiting Time = %d, Turnaround Time = %d\n",
+                    process.getName(), process.getWaitingTime(), process.getTurnAroundTime());
+        }
+
+        System.out.printf("Average Waiting Time: %.2f\n", (double) totalWaitingTime / completedProcesses.size());
+        System.out.printf("Average Turnaround Time: %.2f\n", (double) totalTurnAroundTime / completedProcesses.size());
     }
 }
