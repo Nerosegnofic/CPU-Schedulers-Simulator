@@ -18,7 +18,7 @@ public class FCAIScheduler extends CPUScheduler {
         V2 = maxBurstTime / 10.0;
     }
 
-    private double calculateFCAIFactor(Process process, int currentTime) {
+    private double calculateFCAIFactor(Process process) {
         return (10 - process.getPriority())
                 + (process.getArrivalTime() / V1)
                 + (process.getRemainingTime() / V2);
@@ -47,8 +47,7 @@ public class FCAIScheduler extends CPUScheduler {
                 }
             }
 
-            int finalCurrentTime = currentTime;
-            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1, finalCurrentTime), calculateFCAIFactor(p2, finalCurrentTime)));
+            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1), calculateFCAIFactor(p2)));
 
             if (!readyQueue.isEmpty()) {
                 if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.getFirst()) {
@@ -56,7 +55,7 @@ public class FCAIScheduler extends CPUScheduler {
                     System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.getFirst().getName());
                 }
 
-                if (currentProcess != readyQueue.getFirst()) {
+                if (currentProcess == null || currentProcess != readyQueue.getFirst()) {
                     currentProcess = readyQueue.getFirst();
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " starts executing.");
                 }
@@ -66,9 +65,8 @@ public class FCAIScheduler extends CPUScheduler {
                 int quantum = currentProcess.getQuantum();
                 int executionTime = (int) Math.ceil(quantum * 0.4);
 
-                if (executionTime > currentProcess.getRemainingTime()) {
+                if (executionTime > currentProcess.getRemainingTime())
                     executionTime = currentProcess.getRemainingTime();
-                }
 
                 currentProcess.process(executionTime);
                 currentTime += executionTime;
@@ -80,7 +78,8 @@ public class FCAIScheduler extends CPUScheduler {
                     currentProcess.setWaitingTime(currentProcess.getTurnAroundTime() - currentProcess.getBurstTime());
                     readyQueue.remove(currentProcess);
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " finishes executing.");
-                } else if (executionTime == currentProcess.getQuantum())
+                }
+                else if (executionTime == currentProcess.getQuantum())
                     currentProcess.setQuantum(currentProcess.getQuantum() + 2);
                 else
                     currentProcess.setQuantum(currentProcess.getQuantum()-executionTime);
