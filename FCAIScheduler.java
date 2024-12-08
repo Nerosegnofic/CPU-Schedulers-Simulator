@@ -51,13 +51,13 @@ public class FCAIScheduler extends CPUScheduler {
             readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1, finalCurrentTime), calculateFCAIFactor(p2, finalCurrentTime)));
 
             if (!readyQueue.isEmpty()) {
-                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(0)) {
+                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.getFirst()) {
                     currentTime += contextSwitchTime;
-                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.get(0).getName());
+                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.getFirst().getName());
                 }
 
-                if (currentProcess != readyQueue.get(0)) {
-                    currentProcess = readyQueue.get(0);
+                if (currentProcess != readyQueue.getFirst()) {
+                    currentProcess = readyQueue.getFirst();
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " starts executing.");
                 }
             }
