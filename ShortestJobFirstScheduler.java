@@ -28,6 +28,7 @@ public class ShortestJobFirstScheduler extends CPUScheduler {
             }
 
             if (!readyQueue.isEmpty()) {
+//                 readyQueue.sort(Comparator.comparingInt(Process::getRemainingTime));
                 int finalCurrentTime = currentTime;
                 readyQueue.sort((p1, p2) -> {
                     // This doesn't actually modify the burst time of the processes,
