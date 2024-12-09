@@ -24,7 +24,7 @@ public class FCAIScheduler extends CPUScheduler {
                 + (process.getRemainingTime() / V2);
     }
 
-    private boolean isAnotherArrived(List<Process> readyQueue, int currentTime) {
+    private void isAnotherArrived(List<Process> readyQueue, int currentTime) {
         boolean arrived = false;
         for (Process process : processes) {
             if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
@@ -35,7 +35,7 @@ public class FCAIScheduler extends CPUScheduler {
         }
         if (arrived)
             readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1), calculateFCAIFactor(p2)));
-        return arrived;
+        // return arrived;
     }
 
     @Override
@@ -78,7 +78,8 @@ public class FCAIScheduler extends CPUScheduler {
                 currentTime += executionTime;
 
                 while(currentProcess.getRemainingTime() != 0){
-                    if ((isAnotherArrived(readyQueue, currentTime) && currentProcess != readyQueue.getFirst()) || currentProcess != readyQueue.getFirst()){
+                    isAnotherArrived(readyQueue, currentTime);
+                    if (currentProcess != readyQueue.getFirst()){
                         index = 0;
                         break;
                     }
