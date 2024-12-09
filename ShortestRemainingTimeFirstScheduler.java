@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
@@ -29,7 +30,7 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
                     System.out.println("Time " + currentTime + ": " + process.getName() + " arrives.");
                 }
             }
-            
+//             readyQueue.sort(Comparator.comparingInt(Process::getRemainingTime));
             int finalCurrentTime = currentTime;
             readyQueue.sort((p1, p2) -> {
                 // This doesn't actually modify the burst time of the processes,
@@ -40,13 +41,13 @@ public class ShortestRemainingTimeFirstScheduler extends CPUScheduler {
             });
             
             if (!readyQueue.isEmpty()) {
-                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(0)) {
+                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.getFirst()) {
                     currentTime += contextSwitchTime;
-                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.get(0).getName());
+                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.getFirst().getName());
                 }
 
-                if (currentProcess != readyQueue.get(0)) {
-                    currentProcess = readyQueue.get(0);
+                if (currentProcess != readyQueue.getFirst()) {
+                    currentProcess = readyQueue.getFirst();
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " starts executing.");
                 }
             }
