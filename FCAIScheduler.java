@@ -24,6 +24,20 @@ public class FCAIScheduler extends CPUScheduler {
                 + (process.getRemainingTime() / V2);
     }
 
+    private boolean isAnotherArrived(List<Process> readyQueue, int currentTime) {
+        boolean arrived = false;
+        for (Process process : processes) {
+            if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
+                readyQueue.add(process);
+                arrived = true;
+                System.out.println("Time " + process.getArrivalTime() + ": " + process.getName() + " arrives.");
+            }
+        }
+        if (arrived)
+            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1), calculateFCAIFactor(p2)));
+        return arrived;
+    }
+
     @Override
     public void execute() {
         int totalWaitingTime = 0;
@@ -38,25 +52,17 @@ public class FCAIScheduler extends CPUScheduler {
         int currentTime = 0;
         int completedProcesses = 0;
         Process currentProcess = null;
-
+        int index = 0;
+        isAnotherArrived(readyQueue, currentTime);
         while (completedProcesses < n) {
-            for (Process process : processes) {
-                if (process.getArrivalTime() <= currentTime && process.getRemainingTime() > 0 && !readyQueue.contains(process)) {
-                    readyQueue.add(process);
-                    System.out.println("Time " + process.getArrivalTime() + ": " + process.getName() + " arrives.");
-                }
-            }
-
-            readyQueue.sort((p1, p2) -> Double.compare(calculateFCAIFactor(p1), calculateFCAIFactor(p2)));
-
             if (!readyQueue.isEmpty()) {
-                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.getFirst()) {
-                    currentTime += contextSwitchTime;
+                index %= readyQueue.size();
+                if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(index)) {
                     System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.getFirst().getName());
                 }
 
-                if (currentProcess == null || currentProcess != readyQueue.getFirst()) {
-                    currentProcess = readyQueue.getFirst();
+                if (currentProcess == null || currentProcess != readyQueue.get(index)) {
+                    currentProcess = readyQueue.get(index);
                     System.out.println("Time " + currentTime + ": " + currentProcess.getName() + " starts executing.");
                 }
             }
@@ -64,13 +70,26 @@ public class FCAIScheduler extends CPUScheduler {
             if (currentProcess != null) {
                 int quantum = currentProcess.getQuantum();
                 int executionTime = (int) Math.ceil(quantum * 0.4);
-
+                
                 if (executionTime > currentProcess.getRemainingTime())
                     executionTime = currentProcess.getRemainingTime();
-
+                
                 currentProcess.process(executionTime);
                 currentTime += executionTime;
 
+                while(currentProcess.getRemainingTime() != 0){
+                    if (isAnotherArrived(readyQueue, currentTime) && currentProcess != readyQueue.getFirst()){
+                        index = 0;
+                        break;
+                    }
+                    else if (executionTime == currentProcess.getQuantum()){
+                        index = (index+1)%readyQueue.size();
+                        break;
+                    }
+                    currentProcess.process(1);
+                    executionTime++;
+                    currentTime++;
+                }
                 if (currentProcess.getRemainingTime() == 0) {
                     completedProcesses++;
                     currentProcess.setCompletionTime(currentTime);
@@ -82,7 +101,7 @@ public class FCAIScheduler extends CPUScheduler {
                 else if (executionTime == currentProcess.getQuantum())
                     currentProcess.setQuantum(currentProcess.getQuantum() + 2);
                 else
-                    currentProcess.setQuantum(currentProcess.getQuantum()-executionTime);
+                    currentProcess.setQuantum(2*currentProcess.getQuantum() - executionTime);
             }
             else
                 currentTime++;
@@ -102,4 +121,9 @@ public class FCAIScheduler extends CPUScheduler {
         System.out.printf("Average Waiting Time: %.2f\n", averageWaitingTime);
         System.out.printf("Average Turnaround Time: %.2f\n", averageTurnaroundTime);
     }
+
+    // @override
+    // public void execute(){
+
+    // }
 }
