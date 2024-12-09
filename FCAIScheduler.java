@@ -58,7 +58,7 @@ public class FCAIScheduler extends CPUScheduler {
             if (!readyQueue.isEmpty()) {
                 index %= readyQueue.size();
                 if (currentProcess != null && currentProcess.getRemainingTime() > 0 && currentProcess != readyQueue.get(index)) {
-                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.getFirst().getName());
+                    System.out.println("Time " + currentTime + ": Context switch to " + readyQueue.get(index).getName());
                 }
 
                 if (currentProcess == null || currentProcess != readyQueue.get(index)) {
@@ -78,12 +78,12 @@ public class FCAIScheduler extends CPUScheduler {
                 currentTime += executionTime;
 
                 while(currentProcess.getRemainingTime() != 0){
-                    if (isAnotherArrived(readyQueue, currentTime) && currentProcess != readyQueue.getFirst()){
+                    if ((isAnotherArrived(readyQueue, currentTime) && currentProcess != readyQueue.getFirst()) || currentProcess != readyQueue.getFirst()){
                         index = 0;
                         break;
                     }
                     else if (executionTime == currentProcess.getQuantum()){
-                        index = (index+1)%readyQueue.size();
+                        index++;
                         break;
                     }
                     currentProcess.process(1);
